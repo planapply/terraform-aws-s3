@@ -3,7 +3,7 @@
 
 set shell := ["bash", "-cu"]
 
-examples := "examples/basic examples/complete"
+examples := "examples/basic examples/complete examples/terraform-state"
 
 # List available recipes
 default:

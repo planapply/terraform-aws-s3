@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dir: [".", "examples/basic", "examples/complete"]
+        dir: [".", "examples/basic", "examples/complete", "examples/terraform-state"]
     steps:
       - uses: actions/checkout@v7
       - uses: hashicorp/setup-terraform@v4

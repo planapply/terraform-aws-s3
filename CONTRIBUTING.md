@@ -8,8 +8,8 @@ Issues and pull requests are welcome.
 just check
 ```
 
-That runs `terraform fmt -check`, `terraform validate` on the module and both
-examples, tflint, checkov, gitleaks, `terraform test`, and a terraform-docs
+That runs `terraform fmt -check`, `terraform validate` on the module and every
+example, tflint, checkov, gitleaks, `terraform test`, and a terraform-docs
 freshness check. CI runs the same set, so a green `just check` means a green
 PR.
 

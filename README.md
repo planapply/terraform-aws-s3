@@ -238,9 +238,13 @@ is_terraform_backend = true
 backend_key_prefix   = "network"
 ```
 
-Versioning is forced on and the `terraform_backend_config` output is a
-ready-to-paste `backend "s3"` block using `use_lockfile = true`, so no
-DynamoDB table is needed on Terraform 1.10 or newer.
+Versioning is forced on and the `terraform_backend_config` output holds the
+`bucket`, `key`, `region`, `encrypt`, and `use_lockfile = true` settings for a
+`backend "s3"` block. Locking is S3 native (`use_lockfile`, Terraform 1.10 or
+newer). Versioning keeps every state write, so pair it with
+`non_current_version_expiration_in_days` to cap the history.
+[`examples/terraform-state`](examples/terraform-state/) renders the backend
+block and covers consumer permissions and bootstrapping.
 
 ## Examples
 
@@ -248,9 +252,11 @@ DynamoDB table is needed on Terraform 1.10 or newer.
 |---|---|
 | [`basic`](examples/basic/) | A bucket named with the composable pattern and every default. |
 | [`complete`](examples/complete/) | Access logging, tiered lifecycle rules, SQS and SNS notifications, additional policy statements, and a second bucket with a custom CloudFront OAC policy. |
+| [`terraform-state`](examples/terraform-state/) | A remote state bucket with S3 native locking, noncurrent version expiry, and a rendered `backend "s3"` block. |
 
-Both set `force_destroy = true` so `terraform destroy` works with objects
-present. Do not copy that into production.
+`basic` and `complete` set `force_destroy = true` so `terraform destroy` works
+with objects present. Do not copy that into production. `terraform-state`
+leaves it off, as a state bucket should.
 
 ## Reference
 

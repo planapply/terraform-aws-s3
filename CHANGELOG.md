@@ -3,6 +3,12 @@
 All notable changes to this module are documented here. Versions follow
 semantic versioning without a `v` prefix.
 
+## 1.0.1 - 2026-10-15
+
+- New `examples/terraform-state` example: a remote state bucket with S3 native
+  locking, noncurrent version expiry, and a rendered `backend "s3"` block.
+- README Terraform state section corrected and linked to the new example.
+
 ## 1.0.0 - 2026-10-15
 
 First public release.

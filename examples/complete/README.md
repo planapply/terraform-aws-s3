@@ -1,6 +1,6 @@
 # Complete example
 
-Exercises most of the module in one apply. Two module calls plus the
+Exercises most of the module in one apply. Three module calls plus the
 supporting resources they need.
 
 ## What it creates
@@ -19,9 +19,16 @@ supporting resources they need.
   Origin Access Control and restricted to the actual distribution ARN created
   by this example. The bucket uses SSE-S3 for CloudFront compatibility.
 
+`module.access_logs` (`access-logs-{account_id}-{region}`):
+
+- the access log target, SSE-S3 because server access logging rejects
+  SSE-KMS targets
+- an additional policy statement letting the S3 logging service write under
+  `enhanced-example-logs/`, scoped by source bucket and account
+- a 90-day expiry lifecycle rule
+
 Supporting resources: an SQS queue and SNS topic with S3 publish permissions,
-an encrypted and versioned access log bucket, a CloudFront OAC, and a
-CloudFront distribution. CloudFront can incur charges; destroy the example
+a CloudFront OAC, and a CloudFront distribution. CloudFront can incur charges; destroy the example
 when finished. The distribution is a minimal OAC demonstration, not a
 production configuration: it omits WAF, access logging, and origin failover.
 

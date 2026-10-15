@@ -27,7 +27,8 @@ regenerated README tables.
 - Terraform 1.12+ (`.terraform-version` matches the version CI pins)
 - [just](https://github.com/casey/just)
 - [tflint](https://github.com/terraform-linters/tflint)
-- [checkov](https://github.com/bridgecrewio/checkov)
+- [uv](https://github.com/astral-sh/uv), `just check` runs the latest
+  [checkov](https://github.com/bridgecrewio/checkov) through `uvx` to match CI
 - [gitleaks](https://github.com/gitleaks/gitleaks)
 - [terraform-docs](https://github.com/terraform-docs/terraform-docs)
 

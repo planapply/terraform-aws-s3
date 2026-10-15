@@ -84,10 +84,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: terraform-docs/gh-actions@v1
-        with:
-          working-dir: .
-          config-file: .terraform-docs.yml
-          output-file: README.md
-          output-method: inject
-          fail-on-diff: true
+      # run the binary so .terraform-docs.yml is the only config, the action overrides its template and indent
+      - name: terraform-docs --output-check
+        env:
+          TFDOCS_VERSION: v0.24.0
+        run: |
+          curl -sSfL "https://github.com/terraform-docs/terraform-docs/releases/download/${TFDOCS_VERSION}/terraform-docs-${TFDOCS_VERSION}-linux-amd64.tar.gz" | tar -xz -C "$RUNNER_TEMP" terraform-docs
+          "$RUNNER_TEMP/terraform-docs" --output-check .

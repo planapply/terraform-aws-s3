@@ -33,7 +33,7 @@ lint:
 
 # checkov and gitleaks
 security:
-    checkov -d . --quiet --compact --framework terraform
+    uvx --python 3.12 checkov -d . --quiet --compact --framework terraform
     gitleaks detect --no-git --source . --redact
 
 # terraform test against the mocked provider in tests/, no AWS credentials needed

@@ -2,6 +2,7 @@
 # Demonstrates the simplest usage of the S3 module
 
 module "basic_bucket" {
+  #checkov:skip=CKV_AWS_144:Example does not set up cross-region replication
   source = "../.."
 
   project_prefix = "example"

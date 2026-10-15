@@ -41,8 +41,8 @@ output "notification_configuration" {
 output "access_logs_bucket" {
   description = "Access logs bucket information"
   value = {
-    name = aws_s3_bucket.access_logs.id
-    arn  = aws_s3_bucket.access_logs.arn
+    name = module.access_logs.bucket_name
+    arn  = module.access_logs.bucket_arn
   }
 }
 

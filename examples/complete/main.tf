@@ -58,53 +58,63 @@ resource "aws_sns_topic_policy" "s3_notifications" {
   })
 }
 
-# Access logs bucket (example)
-resource "aws_s3_bucket" "access_logs" {
-  bucket        = "access-logs-${data.aws_caller_identity.current.account_id}-${var.aws_region}"
+# Access logs bucket, built with this module
+module "access_logs" {
+  #checkov:skip=CKV_AWS_145:S3 server access logging only delivers to SSE-S3 target buckets
+  #checkov:skip=CKV_AWS_144:Example does not set up cross-region replication
+  source = "../.."
+
+  bucket_name   = "access-logs"
+  bucket_suffix = var.aws_region
   force_destroy = true
-}
+  use_sse_s3    = true # server access logging rejects SSE-KMS targets
 
-resource "aws_s3_bucket_versioning" "access_logs" {
-  bucket = aws_s3_bucket.access_logs.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
-  bucket = aws_s3_bucket.access_logs.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-
-# server access logs are written by the S3 logging service, it needs PutObject on the target prefix
-resource "aws_s3_bucket_policy" "access_logs" {
-  bucket = aws_s3_bucket.access_logs.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid       = "S3ServerAccessLogsPolicy"
-        Effect    = "Allow"
-        Principal = { Service = "logging.s3.amazonaws.com" }
-        Action    = "s3:PutObject"
-        Resource  = "${aws_s3_bucket.access_logs.arn}/enhanced-example-logs/*"
-        Condition = {
-          ArnLike      = { "aws:SourceArn" = "arn:aws:s3:::enhanced-example-${data.aws_caller_identity.current.account_id}" }
-          StringEquals = { "aws:SourceAccount" = data.aws_caller_identity.current.account_id }
-        }
+  # server access logs are written by the S3 logging service, it needs PutObject on the target prefix
+  additional_policy_statements = [
+    {
+      sid       = "S3ServerAccessLogsPolicy"
+      effect    = "Allow"
+      actions   = ["s3:PutObject"]
+      resources = ["arn:aws:s3:::access-logs-${data.aws_caller_identity.current.account_id}-${var.aws_region}/enhanced-example-logs/*"]
+      principals = {
+        type        = "Service"
+        identifiers = ["logging.s3.amazonaws.com"]
       }
-    ]
-  })
+      conditions = [
+        {
+          test     = "ArnLike"
+          variable = "aws:SourceArn"
+          values   = ["arn:aws:s3:::enhanced-example-${data.aws_caller_identity.current.account_id}"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "aws:SourceAccount"
+          values   = [data.aws_caller_identity.current.account_id]
+        }
+      ]
+    }
+  ]
+
+  lifecycle_rules = [
+    {
+      id                                 = "expire_logs"
+      status                             = "Enabled"
+      expiration_days                    = 90
+      noncurrent_version_expiration_days = 30
+    }
+  ]
+
+  tags = {
+    Environment = "development"
+    Project     = "enhanced-s3-example"
+    Purpose     = "access-log-target"
+    ManagedBy   = "terraform"
+  }
 }
 
 # Enhanced S3 bucket with all new features
 module "enhanced_s3_bucket" {
+  #checkov:skip=CKV_AWS_144:Example does not set up cross-region replication
   source = "../.."
 
   # Basic configuration
@@ -118,7 +128,7 @@ module "enhanced_s3_bucket" {
 
   # Enhanced access logging
   enable_access_logging    = true
-  access_log_target_bucket = aws_s3_bucket.access_logs.id
+  access_log_target_bucket = module.access_logs.bucket_id
   access_log_target_prefix = "enhanced-example-logs/"
 
   # Enhanced lifecycle configuration with multiple rules
@@ -239,7 +249,7 @@ module "enhanced_s3_bucket" {
     ManagedBy   = "terraform"
   }
 
-  depends_on = [aws_s3_bucket_policy.access_logs]
+  depends_on = [module.access_logs]
 }
 
 # ============================================================================
@@ -267,7 +277,10 @@ resource "aws_cloudfront_distribution" "example" {
   #checkov:skip=CKV_AWS_68:Example distribution omits WAF to avoid unrelated resources and costs
   #checkov:skip=CKV_AWS_310:Example has one origin, so origin failover is not applicable
   #checkov:skip=CKV_AWS_374:Example leaves geographic access unrestricted
-  #checkov:skip=CKV_AWS_174:TLSv1.2_2021 is configured, but Checkov 3.3.20 does not recognize this policy
+  #checkov:skip=CKV2_AWS_42:Example uses the default CloudFront certificate, no custom domain
+  #checkov:skip=CKV2_AWS_32:Example omits a response headers policy to keep the OAC example focused
+  #checkov:skip=CKV2_AWS_47:Example omits WAF, so there is no WebACL to configure
+  #checkov:skip=CKV_AWS_174:Default CloudFront certificate ignores minimum_protocol_version, a custom cert is out of scope here
   enabled             = true
   default_root_object = "index.html"
   comment             = "Example S3 origin using OAC"
@@ -308,6 +321,8 @@ resource "aws_cloudfront_distribution" "example" {
 
 # S3 bucket with custom policy for CloudFront OAC
 module "cloudfront_origin_bucket" {
+  #checkov:skip=CKV_AWS_145:SSE-S3 so CloudFront OAC can read objects without KMS key policy changes
+  #checkov:skip=CKV_AWS_144:Example does not set up cross-region replication
   source = "../.."
 
   # Basic configuration

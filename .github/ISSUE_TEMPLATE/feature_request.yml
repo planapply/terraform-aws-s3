@@ -1,0 +1,22 @@
+name: Feature request
+description: Something the module should do
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do
+      description: The bucket configuration you need and why the current inputs do not get you there.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed inputs or behavior
+      description: Sketch the variable names and shape if you have an opinion.
+      render: hcl
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Current workaround
+      description: custom_bucket_policy, a second resource outside the module, etc.

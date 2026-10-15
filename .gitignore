@@ -1,0 +1,37 @@
+# terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+.terraform.lock.hcl
+*.tfvars
+*.tfvars.json
+!examples/**/*.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+tfplan
+*.tfplan
+
+# tooling
+.tflint.d/
+.checkov/
+.pre-commit-cache/
+
+# editor / os
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+
+# scratch
+tmp/
+
+# local agent notes
+CLAUDE.md
+AGENTS.md

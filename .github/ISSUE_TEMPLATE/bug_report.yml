@@ -1,0 +1,40 @@
+name: Bug report
+description: Something the module does wrong
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Module version
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: terraform
+    attributes:
+      label: Terraform and AWS provider versions
+      placeholder: "terraform 1.12.0, aws 6.4.0"
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: Module call that reproduces it
+      description: Trim to the inputs that matter. No account IDs or secrets.
+      render: hcl
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: Plan or apply output, error text.
+      render: text
+    validations:
+      required: true

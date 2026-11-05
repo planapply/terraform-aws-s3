@@ -3,7 +3,7 @@
 All notable changes to this module are documented here. Versions follow
 semantic versioning without a `v` prefix.
 
-## 1.0.2 - Unreleased
+## 1.0.2 - 2026-11-05
 
 - `encryption_kms_key_arn` validation accepts every AWS partition (GovCloud,
   China, ISO) and multi-region (`mrk-`) key ARNs. Both were rejected before.

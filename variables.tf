@@ -204,7 +204,8 @@ variable "encryption_kms_key_arn" {
   type        = string
   default     = null
   validation {
-    condition     = var.encryption_kms_key_arn == null || can(regex("^arn:aws:kms:[a-z0-9-]+:[0-9]{12}:key/[a-f0-9-]{36}$", var.encryption_kms_key_arn)) || can(regex("^arn:aws:kms:[a-z0-9-]+:[0-9]{12}:alias/.+$", var.encryption_kms_key_arn))
+    # any partition (aws, aws-us-gov, aws-cn, aws-iso*), mrk- is a multi-region key id
+    condition     = var.encryption_kms_key_arn == null || can(regex("^arn:aws[a-z-]*:kms:[a-z0-9-]+:[0-9]{12}:key/(mrk-[a-f0-9]{32}|[a-f0-9-]{36})$", var.encryption_kms_key_arn)) || can(regex("^arn:aws[a-z-]*:kms:[a-z0-9-]+:[0-9]{12}:alias/.+$", var.encryption_kms_key_arn))
     error_message = "KMS key ARN must be a valid AWS KMS key ARN or alias ARN format."
   }
 }

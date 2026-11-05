@@ -142,3 +142,33 @@ run "merged_conditions_and_scoped_logs" {
     error_message = "TLS-only deny missing"
   }
 }
+
+# kms arn validation must accept every partition and multi-region keys
+run "kms_arn_govcloud" {
+  command = plan
+  variables {
+    encryption_kms_key_arn = "arn:aws-us-gov:kms:us-gov-west-1:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab"
+  }
+}
+
+run "kms_arn_china_alias" {
+  command = plan
+  variables {
+    encryption_kms_key_arn = "arn:aws-cn:kms:cn-north-1:111122223333:alias/app-data"
+  }
+}
+
+run "kms_arn_multi_region" {
+  command = plan
+  variables {
+    encryption_kms_key_arn = "arn:aws:kms:us-east-1:111122223333:key/mrk-1234abcd12ab34cd56ef1234567890ab"
+  }
+}
+
+run "kms_arn_bad_partition_rejected" {
+  command = plan
+  variables {
+    encryption_kms_key_arn = "arn:gcp:kms:us-east-1:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab"
+  }
+  expect_failures = [var.encryption_kms_key_arn]
+}

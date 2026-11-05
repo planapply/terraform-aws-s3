@@ -3,6 +3,11 @@
 All notable changes to this module are documented here. Versions follow
 semantic versioning without a `v` prefix.
 
+## 1.0.2 - Unreleased
+
+- `encryption_kms_key_arn` validation accepts every AWS partition (GovCloud,
+  China, ISO) and multi-region (`mrk-`) key ARNs. Both were rejected before.
+
 ## 1.0.1 - 2026-10-15
 
 - New `examples/terraform-state` example: a remote state bucket with S3 native
